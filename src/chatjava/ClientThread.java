@@ -20,7 +20,6 @@ public class ClientThread implements Runnable {
     private DataOutputStream out = null;
     public String clientName = null;
     public String room = null;
-    private boolean running = true;
 
     //Constructor
     public ClientThread(Socket socket, ClientThread[] clientesConectados, String room) {
@@ -62,11 +61,9 @@ public class ClientThread implements Runnable {
 
                     ChatJava CJ = new ChatJava();
 
-                    if (room.contains("Reunion")) { //Se llama el metodo con el nombre del usuario  y el cuarto para que sepa de donde sacar al usuario
+                    //Se llama el metodo con el nombre del usuario  y el cuarto para que sepa de donde sacar al usuario
                         CJ.clienteSalio( this.clientName, this.room);
-                    } else {
-                        CJ.clienteSalio( this.clientName, this.room);
-                    }
+                    
 
                     this.clientesEsperando = null;
                     this.clientesConectados = null;
@@ -83,8 +80,8 @@ public class ClientThread implements Runnable {
                         }
                     } else {
                         for (int c = 0; c < clientesEsperando.length; c++) {
-                            if (clientesEsperando[c] != null && clientesEsperando[c].clientName != this.clientName) { //Para que uno no se mande un mensaje a si mismo
-                                clientesEsperando[c].sendMessage(message, clientName); // Hace un loop a traves de toda la lista y llama a los objetos del metodo sendMessage
+                            if (clientesEsperando[c] != null && clientesEsperando[c].clientName != this.clientName) { 
+                                clientesEsperando[c].sendMessage(message, clientName); 
                             }
                         }
                     }
