@@ -34,7 +34,7 @@ public class ClientChat {
 
         try {
 
-            //connect
+            //connectar
             socket = new Socket(ip, puerto);
 
             //streams
@@ -77,8 +77,7 @@ public class ClientChat {
                     System.out.println(message);
 
                 } catch (IOException e) {
-                
-                    exit(0);
+                    exit(0); // Cierra el proceso
                 }
 
             }
