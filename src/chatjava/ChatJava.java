@@ -21,8 +21,8 @@ import java.util.logging.Handler;
 public class ChatJava {
 
     private static int clientesEnReunion = 0;
-    private static int MAXCLIENTES = 1;
-    private static int MAXESPERANDO = 1;
+    private static int MAXCLIENTES = 2;
+    private static int MAXESPERANDO = 3;
     private static int puerto = 4444;
 
     private static ServerSocket server = null;
@@ -104,6 +104,7 @@ public class ChatJava {
     private void IntercambioDeUsuarios(String name) throws IOException
     {
         for (int c = 0; c < clientesConectados.length; c++) {
+            try {
                 if (name.equals(clientesConectados[c].clientName)) {    // En caso de que un cliente en el cuarto de reuniones salga
                     clientesEnReunion = clientesEnReunion - 1;  //Disminuye el contador de clientes en el cuarto
                     for (int e = 0; e < clientesEsperando.length; e++) {
@@ -115,6 +116,7 @@ public class ChatJava {
                             clientesEsperando[e].actualizarCuartosReunion(clientesConectados); // Los siguientes metodos actualizan las listas de clientesEsperando que estan conectados en la clase ClientThread
                             clientesEsperando[e].actualizarCuartosEspera(clientesEsperando);
                             clientesEsperando[e].clientesEsperando = null; // Elimina la lista de clientesEsperando al usuario que se acaba de conectar
+                            
                             try {
                                 //En caso de que el usuario este de ultimo en la lista de espera, esto es para que no haya salga fuera del rango de la lista
                                 clientesEsperando[e] = clientesEsperando[e + 1];
@@ -125,8 +127,10 @@ public class ChatJava {
                             
                             if (clientesEsperando[e] != null) { // en caso de que no haya nadie en la lista de espera, que no actualize.
                                 clientesEsperando[e].actualizarCuartosEspera(clientesEsperando);
+                                clientesEsperando[e] = null;
                                 break;
                             }
+                            clientesEsperando[e] = null;
                             break; // Los breaks son para que no siga una vez que encuentre un usuario.
                         }
                     }
@@ -134,10 +138,14 @@ public class ChatJava {
                     clientesConectados[c].actualizarCuartosEspera(clientesEsperando);
                     if (name.equals(clientesConectados[c].clientName)) { // En caso de que si se hubiera movido alguien de la lista de espera a la de conectados, este if es para que no se les ponga null
                         clientesConectados[c] = null;
+                        
                     }else{
                     clientesConectados[c].sendCambio();} //Se le envia un mensaje al usuario que fue movido de cuarto
                     break;
                 }
+            } catch (Exception e) {
+            }
+                
             }
     }
 

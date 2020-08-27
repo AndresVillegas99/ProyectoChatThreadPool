@@ -15,7 +15,7 @@ public class ClientThread implements Runnable {
 
     public ClientThread[] clientesConectados;
     public ClientThread[] clientesEsperando;
-    private Socket socket = null;
+    public Socket socket = null;
     private DataInputStream in = null;
     private DataOutputStream out = null;
     public String clientName = null;
