@@ -71,8 +71,8 @@ public class ClientThread implements Runnable {
                     this.clientesEsperando = null;
                     this.clientesConectados = null;
                     in.close();
-                    Thread.currentThread().interrupt();
-                    return;
+                    this.socket.close();
+                    continue;
                     
                 } else {
                     if (room.contains("Reunion")) { // Se utiliza para identificar a cual cuarto se manda cual mensaje.

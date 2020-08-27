@@ -21,8 +21,8 @@ import java.util.logging.Handler;
 public class ChatJava {
 
     private static int clientesEnReunion = 0;
-    private static int MAXCLIENTES = 2;
-    private static int MAXESPERANDO = 2;
+    private static int MAXCLIENTES = 1;
+    private static int MAXESPERANDO = 1;
     private static int puerto = 4444;
 
     private static ServerSocket server = null;
@@ -115,9 +115,14 @@ public class ChatJava {
                             clientesEsperando[e].actualizarCuartosReunion(clientesConectados); // Los siguientes metodos actualizan las listas de clientesEsperando que estan conectados en la clase ClientThread
                             clientesEsperando[e].actualizarCuartosEspera(clientesEsperando);
                             clientesEsperando[e].clientesEsperando = null; // Elimina la lista de clientesEsperando al usuario que se acaba de conectar
-                            if (clientesEsperando[e + 1] != null) {  //En caso de que el usuario este de ultimo en la lista de espera, esto es para que no haya salga fuera del rango de la lista
+                            try {
+                                //En caso de que el usuario este de ultimo en la lista de espera, esto es para que no haya salga fuera del rango de la lista
                                 clientesEsperando[e] = clientesEsperando[e + 1];
+                            } catch (Exception z) {
+                                
                             }
+ 
+                            
                             if (clientesEsperando[e] != null) { // en caso de que no haya nadie en la lista de espera, que no actualize.
                                 clientesEsperando[e].actualizarCuartosEspera(clientesEsperando);
                                 break;
@@ -129,8 +134,8 @@ public class ChatJava {
                     clientesConectados[c].actualizarCuartosEspera(clientesEsperando);
                     if (name.equals(clientesConectados[c].clientName)) { // En caso de que si se hubiera movido alguien de la lista de espera a la de conectados, este if es para que no se les ponga null
                         clientesConectados[c] = null;
-                    }
-                    clientesConectados[c].sendCambio(); //Se le envia un mensaje al usuario que fue movido de cuarto
+                    }else{
+                    clientesConectados[c].sendCambio();} //Se le envia un mensaje al usuario que fue movido de cuarto
                     break;
                 }
             }
