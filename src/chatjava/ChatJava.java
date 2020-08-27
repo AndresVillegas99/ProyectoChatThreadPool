@@ -53,7 +53,7 @@ public class ChatJava {
                 }
             }
 
-            System.out.println("Client connected!");
+            System.out.println("Cliente conectado");
             if (clientesEnReunion < clientesConectados.length) {
                 for (int c = 0; c < clientesConectados.length; c++) {
                     //Crea un nuevo thread donde los usuarios o clientes en esta conexion van a estar hablando en la sala de "Reunion de clientes"
