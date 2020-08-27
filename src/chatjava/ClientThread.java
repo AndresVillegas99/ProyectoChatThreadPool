@@ -63,15 +63,17 @@ public class ClientThread implements Runnable {
                     ChatJava CJ = new ChatJava();
 
                     if (room.contains("Reunion")) { //Se llama el metodo con el nombre del usuario  y el cuarto para que sepa de donde sacar al usuario
-                        CJ.clienteSalio( this.clientName);
+                        CJ.clienteSalio( this.clientName, this.room);
                     } else {
-                        CJ.clienteSalio( this.clientName);
+                        CJ.clienteSalio( this.clientName, this.room);
                     }
 
                     this.clientesEsperando = null;
                     this.clientesConectados = null;
                     in.close();
-                    continue;
+                    Thread.currentThread().interrupt();
+                    return;
+                    
                 } else {
                     if (room.contains("Reunion")) { // Se utiliza para identificar a cual cuarto se manda cual mensaje.
                         for (int c = 0; c < clientesConectados.length; c++) {

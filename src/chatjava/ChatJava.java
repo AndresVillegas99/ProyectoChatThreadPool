@@ -22,7 +22,7 @@ public class ChatJava {
 
     private static int clientesEnReunion = 0;
     private static int MAXCLIENTES = 2;
-    private static int MAXESPERANDO = 3;
+    private static int MAXESPERANDO = 2;
     private static int puerto = 4444;
 
     private static ServerSocket server = null;
@@ -64,7 +64,7 @@ public class ChatJava {
                     if (clientesConectados[c] == null) {
                         pool.execute(clientesConectados[c] = new ClientThread(clientSocket, clientesConectados, "Reunion de clientes"));
                         clientesEnReunion++;
-                        
+
                         break;
                     }
                 }
@@ -82,52 +82,58 @@ public class ChatJava {
         }
     }
 
-    public void clienteSalio( String name) throws IOException { //Metodo que se llama cuando un cliente sale de un cuarto
+    public void clienteSalio(String name, String cuarto) throws IOException  { //Metodo que se llama cuando un cliente sale de un cuarto
+        if (cuarto.equals("Reunion de clientes")) {
+            IntercambioDeUsuarios(name);
+        } else {
+            for (int c = 0; c < clientesEsperando.length; c++) { // Transforma cualquier usuario que escribio salir en la lista de espera a null
+                if (clientesEsperando[c] != null) {
+                    if (name.equals(clientesEsperando[c].clientName)) {
 
-        for (int c = 0; c < clientesConectados.length; c++) {
-            if (name.equals(clientesConectados[c].clientName)) {    // En caso de que un cliente en el cuarto de reuniones salga
-
-                clientesEnReunion = clientesEnReunion - 1;  //Disminuye el contador de clientes en el cuarto
-                for (int e = 0; e < clientesEsperando.length; e++) {
-                    if (clientesEsperando[e] != null) {     //Revisa si hay alguna persona en el cuarto de espera
-                        clientesEsperando[e].clientesConectados = clientesConectados[c].clientesConectados; //Copia la lista de el cliente actual al cliente que esta esperando para que esten en el mismo cuarto 
-                        clientesConectados[c] = clientesEsperando[e]; //El cliente en espera ahora esta en el cuarto de Reunion
-                        clientesConectados[c].room = "Reunion de clientes"; // Se cambia el nombre de la habitacion
-                        clientesEnReunion = clientesEnReunion + 1; // Ya que habia alguien en el cuarto de espera se le vuelve a sumar 1 a los clientes en Reunion
-                        clientesEsperando[e].actualizarCuartosReunion(clientesConectados); // Los siguientes metodos actualizan las listas de clientesEsperando que estan conectados en la clase ClientThread
-                        clientesEsperando[e].actualizarCuartosEspera(clientesEsperando);
-                        clientesEsperando[e].clientesEsperando = null; // Elimina la lista de clientesEsperando al usuario que se acaba de conectar
-                        if(clientesEsperando[e + 1] != null){  //En caso de que el usuario este de ultimo en la lista de espera, esto es para que no haya salga fuera del rango de la lista
-                        clientesEsperando[e] = clientesEsperando[e + 1];
-                        }
-                        if (clientesEsperando[e] != null) { // en caso de que no haya nadie en la lista de espera, que no actualize.
-                            clientesEsperando[e].actualizarCuartosEspera(clientesEsperando);
-                            break;
-                        }
-                        break; // Los breaks son para que no siga una vez que encuentre un usuario.
+                        clientesEsperando[c].actualizarCuartosReunion(clientesConectados);
+                        clientesEsperando[c].actualizarCuartosEspera(clientesEsperando);
+                        clientesEsperando[c] = null;
+                        break;
                     }
                 }
-                clientesConectados[c].actualizarCuartosReunion(clientesConectados); //Actualiza la lista del cliente que ahora esta conectado para que reconozca que estan en la misma clase
-                clientesConectados[c].actualizarCuartosEspera(clientesEsperando);
-                if (name.equals(clientesConectados[c].clientName)){ // En caso de que si se hubiera movido alguien de la lista de espera a la de conectados, este if es para que no se les ponga null
-                clientesConectados[c] = null;
-                }
-                clientesConectados[c].sendCambio(); //Se le envia un mensaje al usuario que fue movido de cuarto
-                break;
             }
         }
-        for (int c = 0; c < clientesEsperando.length; c++) { // Transforma cualquier usuario que escribio salir en la lista de espera a null
-            if (clientesEsperando[c] != null) {
-                if (name.equals(clientesEsperando[c].clientName)) {
-                    
-                    clientesEsperando[c].actualizarCuartosReunion(clientesConectados);
-                    clientesEsperando[c].actualizarCuartosEspera(clientesEsperando);
-                    clientesEsperando[c] = null;
+
+    }
+    
+    private void IntercambioDeUsuarios(String name) throws IOException
+    {
+        for (int c = 0; c < clientesConectados.length; c++) {
+                if (name.equals(clientesConectados[c].clientName)) {    // En caso de que un cliente en el cuarto de reuniones salga
+                    clientesEnReunion = clientesEnReunion - 1;  //Disminuye el contador de clientes en el cuarto
+                    for (int e = 0; e < clientesEsperando.length; e++) {
+                        if (clientesEsperando[e] != null) {     //Revisa si hay alguna persona en el cuarto de espera
+                            clientesEsperando[e].clientesConectados = clientesConectados[c].clientesConectados; //Copia la lista de el cliente actual al cliente que esta esperando para que esten en el mismo cuarto 
+                            clientesConectados[c] = clientesEsperando[e]; //El cliente en espera ahora esta en el cuarto de Reunion
+                            clientesConectados[c].room = "Reunion de clientes"; // Se cambia el nombre de la habitacion
+                            clientesEnReunion = clientesEnReunion + 1; // Ya que habia alguien en el cuarto de espera se le vuelve a sumar 1 a los clientes en Reunion
+                            clientesEsperando[e].actualizarCuartosReunion(clientesConectados); // Los siguientes metodos actualizan las listas de clientesEsperando que estan conectados en la clase ClientThread
+                            clientesEsperando[e].actualizarCuartosEspera(clientesEsperando);
+                            clientesEsperando[e].clientesEsperando = null; // Elimina la lista de clientesEsperando al usuario que se acaba de conectar
+                            if (clientesEsperando[e + 1] != null) {  //En caso de que el usuario este de ultimo en la lista de espera, esto es para que no haya salga fuera del rango de la lista
+                                clientesEsperando[e] = clientesEsperando[e + 1];
+                            }
+                            if (clientesEsperando[e] != null) { // en caso de que no haya nadie en la lista de espera, que no actualize.
+                                clientesEsperando[e].actualizarCuartosEspera(clientesEsperando);
+                                break;
+                            }
+                            break; // Los breaks son para que no siga una vez que encuentre un usuario.
+                        }
+                    }
+                    clientesConectados[c].actualizarCuartosReunion(clientesConectados); //Actualiza la lista del cliente que ahora esta conectado para que reconozca que estan en la misma clase
+                    clientesConectados[c].actualizarCuartosEspera(clientesEsperando);
+                    if (name.equals(clientesConectados[c].clientName)) { // En caso de que si se hubiera movido alguien de la lista de espera a la de conectados, este if es para que no se les ponga null
+                        clientesConectados[c] = null;
+                    }
+                    clientesConectados[c].sendCambio(); //Se le envia un mensaje al usuario que fue movido de cuarto
                     break;
                 }
             }
-        }
-        
     }
 
 }
